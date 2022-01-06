@@ -15,17 +15,39 @@ const main = async () => {
     const mediaTxn = await mediaContract.sendMedia("https://youtube.com/2391209");
     await mediaTxn.wait();
 
-    const mediaTxn2 = await mediaContract.sendMedia("https://youtube.com/23321");
-    await mediaTxn2.wait();
-
-    contractBalance = await hre.ethers.provider.getBalance(mediaContract.address);
+    const [firstPerson, randomPerson] = await hre.ethers.getSigners();
+    let firstPersonBalance = await hre.ethers.provider.getBalance(firstPerson.address);
     console.log(
-        "Contract balance:",
-        hre.ethers.utils.formatEther(contractBalance)
+        "First Person balance previous:",
+        hre.ethers.utils.formatEther(firstPersonBalance)
+    );
+
+    let secondPersonBalance = await hre.ethers.provider.getBalance(randomPerson.address);
+    console.log(
+        "Second Person balance previous:",
+        hre.ethers.utils.formatEther(secondPersonBalance)
     );
 
     let allMedias = await mediaContract.getAllMedias();
+    mediaTxn2 = await mediaContract.connect(randomPerson).thankMedia(allMedias[0].id,  {value: hre.ethers.utils.parseEther("1")});
+    await mediaTxn2.wait(); // Wait for the transaction to be mined
+
+    firstPersonBalance = await hre.ethers.provider.getBalance(firstPerson.address);
+    console.log(
+        "First Person balance:",
+        hre.ethers.utils.formatEther(firstPersonBalance)
+    );
+    secondPersonBalance = await hre.ethers.provider.getBalance(randomPerson.address);
+    console.log(
+        "Second Person balance:",
+        hre.ethers.utils.formatEther(secondPersonBalance)
+    );
+
+    allMedias = await mediaContract.getAllMedias();
     console.log(allMedias);
+
+    let allThanks = await mediaContract.getThanksByAddress(randomPerson.address);
+    console.log(allThanks);
 };
 
 const runMain = async () => {
