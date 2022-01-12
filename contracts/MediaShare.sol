@@ -24,7 +24,7 @@ contract MediaShare {
         uint256 value;
     }
 
-    Media[] medias;
+    Media[] public medias;
     mapping(address => Thanks[]) public thanks;
 
     constructor() {
@@ -48,7 +48,7 @@ contract MediaShare {
         return totalMedias;
     }
 
-    function getMediaIndexById(uint256 _id) private returns (uint256, bool) {
+    function getMediaIndexById(uint256 _id) private view returns (uint256, bool) {
         for (uint j = 0; j < medias.length; j++) {
             if(medias[j].id == _id){
                 return (j, false);
